@@ -191,34 +191,68 @@ function Switch-Environment {
 
     $projectRoot = Split-Path -Parent $configRoot
 
-    # バックエンドの.envを更新
+    # バックエンドの.envを更新（テンプレートからコピー）
+    $backendTemplate = Join-Path $projectRoot "tb-acq-backend\.env.$TargetEnv"
     $backendEnv = Join-Path $projectRoot "tb-acq-backend\.env"
     Write-Info "更新中: tb-acq-backend\.env"
-    Update-EnvFile -FilePath $backendEnv -EnvName $TargetEnv -Variables @{
-        "MQTT_URL" = $config.mqtt.broker_url
-        "BACKEND_PORT" = $config.backend.port
-        "INFLUXDB_URL" = $config.influxdb.url
+    if (Test-Path $backendTemplate) {
+        $backendDir = Split-Path -Parent $backendEnv
+        if (-not (Test-Path $backendDir)) {
+            New-Item -ItemType Directory -Path $backendDir -Force | Out-Null
+        }
+        Copy-Item -Path $backendTemplate -Destination $backendEnv -Force
+        if (Test-Path $backendEnv) {
+            Write-Success "完了: tb-acq-backend\.env (← .env.$TargetEnv)"
+        } else {
+            Write-Error "ファイルの作成に失敗しました: $backendEnv"
+            return $false
+        }
+    } else {
+        Write-Error "テンプレートが見つかりません: $backendTemplate"
+        return $false
     }
-    Write-Success "完了: tb-acq-backend\.env"
 
-    # フロントエンドの.env.{TargetEnv}を更新（Vite --mode対応）
-    $frontendEnv = Join-Path $projectRoot "tb-acq-app\.env.$TargetEnv"
-    Write-Info "更新中: tb-acq-app\.env.$TargetEnv"
-    Update-EnvFile -FilePath $frontendEnv -EnvName $TargetEnv -Variables @{
-        "VITE_ENV_NAME" = $TargetEnv
-        "VITE_BACKEND_URL" = $config.backend.url
+    # フロントエンドの.envを更新（テンプレートからコピー）
+    $frontendTemplate = Join-Path $projectRoot "tb-acq-app\.env.$TargetEnv"
+    $frontendEnv = Join-Path $projectRoot "tb-acq-app\.env"
+    Write-Info "更新中: tb-acq-app\.env"
+    if (Test-Path $frontendTemplate) {
+        $frontendDir = Split-Path -Parent $frontendEnv
+        if (-not (Test-Path $frontendDir)) {
+            New-Item -ItemType Directory -Path $frontendDir -Force | Out-Null
+        }
+        Copy-Item -Path $frontendTemplate -Destination $frontendEnv -Force
+        if (Test-Path $frontendEnv) {
+            Write-Success "完了: tb-acq-app\.env (← .env.$TargetEnv)"
+        } else {
+            Write-Error "ファイルの作成に失敗しました: $frontendEnv"
+            return $false
+        }
+    } else {
+        Write-Error "テンプレートが見つかりません: $frontendTemplate"
+        return $false
     }
-    Write-Success "完了: tb-acq-app\.env.$TargetEnv"
 
-    # データパイプラインの.envを更新
+    # データパイプラインの.envを更新（テンプレートからコピー）
+    $pipelineTemplate = Join-Path $projectRoot "tb-data-pipeline\.env.$TargetEnv"
     $pipelineEnv = Join-Path $projectRoot "tb-data-pipeline\.env"
     Write-Info "更新中: tb-data-pipeline\.env"
-    Update-EnvFile -FilePath $pipelineEnv -EnvName $TargetEnv -Variables @{
-        "INFLUXDB_URL" = $config.influxdb.url
-        "INFLUXDB_TOKEN" = $config.influxdb.token
-        "INFLUXDB_ORG" = $config.influxdb.org
+    if (Test-Path $pipelineTemplate) {
+        $pipelineDir = Split-Path -Parent $pipelineEnv
+        if (-not (Test-Path $pipelineDir)) {
+            New-Item -ItemType Directory -Path $pipelineDir -Force | Out-Null
+        }
+        Copy-Item -Path $pipelineTemplate -Destination $pipelineEnv -Force
+        if (Test-Path $pipelineEnv) {
+            Write-Success "完了: tb-data-pipeline\.env (← .env.$TargetEnv)"
+        } else {
+            Write-Error "ファイルの作成に失敗しました: $pipelineEnv"
+            return $false
+        }
+    } else {
+        Write-Error "テンプレートが見つかりません: $pipelineTemplate"
+        return $false
     }
-    Write-Success "完了: tb-data-pipeline\.env"
 
     Write-Host ""
     Write-Success "環境の切り替えが完了しました: $TargetEnv"

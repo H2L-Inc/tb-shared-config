@@ -196,34 +196,59 @@ switch_environment() {
     local influx_token=$(echo "$config" | jq -r '.influxdb.token')
     local influx_org=$(echo "$config" | jq -r '.influxdb.org')
 
-    # バックエンドの.envを更新
+    # バックエンドの.envを更新（テンプレートからコピー）
     print_info "更新中: tb-acq-backend/.env"
-    update_env_file \
-        "$PROJECT_ROOT/tb-acq-backend/.env" \
-        "$target_env" \
-        "MQTT_URL=$mqtt_url" \
-        "BACKEND_PORT=$backend_port" \
-        "INFLUXDB_URL=$influx_url"
-    print_success "完了: tb-acq-backend/.env"
+    local backend_template="$PROJECT_ROOT/tb-acq-backend/.env.$target_env"
+    local backend_env="$PROJECT_ROOT/tb-acq-backend/.env"
+    if [ -f "$backend_template" ]; then
+        mkdir -p "$(dirname "$backend_env")"
+        cp "$backend_template" "$backend_env"
+        if [ -f "$backend_env" ]; then
+            print_success "完了: tb-acq-backend/.env (← .env.$target_env)"
+        else
+            print_error "ファイルの作成に失敗しました: $backend_env"
+            return 1
+        fi
+    else
+        print_error "テンプレートが見つかりません: $backend_template"
+        return 1
+    fi
 
-    # フロントエンドの.env.{target_env}を更新（Vite --mode対応）
-    print_info "更新中: tb-acq-app/.env.$target_env"
-    update_env_file \
-        "$PROJECT_ROOT/tb-acq-app/.env.$target_env" \
-        "$target_env" \
-        "VITE_ENV_NAME=$target_env" \
-        "VITE_BACKEND_URL=$backend_url"
-    print_success "完了: tb-acq-app/.env.$target_env"
+    # フロントエンドの.envを更新（テンプレートからコピー）
+    print_info "更新中: tb-acq-app/.env"
+    local frontend_template="$PROJECT_ROOT/tb-acq-app/.env.$target_env"
+    local frontend_env="$PROJECT_ROOT/tb-acq-app/.env"
+    if [ -f "$frontend_template" ]; then
+        mkdir -p "$(dirname "$frontend_env")"
+        cp "$frontend_template" "$frontend_env"
+        if [ -f "$frontend_env" ]; then
+            print_success "完了: tb-acq-app/.env (← .env.$target_env)"
+        else
+            print_error "ファイルの作成に失敗しました: $frontend_env"
+            return 1
+        fi
+    else
+        print_error "テンプレートが見つかりません: $frontend_template"
+        return 1
+    fi
 
-    # データパイプラインの.envを更新
+    # データパイプラインの.envを更新（テンプレートからコピー）
     print_info "更新中: tb-data-pipeline/.env"
-    update_env_file \
-        "$PROJECT_ROOT/tb-data-pipeline/.env" \
-        "$target_env" \
-        "INFLUXDB_URL=$influx_url" \
-        "INFLUXDB_TOKEN=$influx_token" \
-        "INFLUXDB_ORG=$influx_org"
-    print_success "完了: tb-data-pipeline/.env"
+    local pipeline_template="$PROJECT_ROOT/tb-data-pipeline/.env.$target_env"
+    local pipeline_env="$PROJECT_ROOT/tb-data-pipeline/.env"
+    if [ -f "$pipeline_template" ]; then
+        mkdir -p "$(dirname "$pipeline_env")"
+        cp "$pipeline_template" "$pipeline_env"
+        if [ -f "$pipeline_env" ]; then
+            print_success "完了: tb-data-pipeline/.env (← .env.$target_env)"
+        else
+            print_error "ファイルの作成に失敗しました: $pipeline_env"
+            return 1
+        fi
+    else
+        print_error "テンプレートが見つかりません: $pipeline_template"
+        return 1
+    fi
 
     echo ""
     print_success "環境の切り替えが完了しました: $target_env"
