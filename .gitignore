@@ -1,1 +1,2 @@
-environments/local.json
+# Removed: now tracking local.json as a template environment
+# environments/local.json
