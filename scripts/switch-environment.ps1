@@ -71,8 +71,8 @@ function Get-AvailableEnvironments {
             Path = $file.FullName
             DisplayName = switch ($envName) {
                 "development" { "開発環境" }
-                "exhibition" { "展示環境" }
                 "production" { "本番環境" }
+                "local" { "ローカル環境" }
                 default { $envName }
             }
         }

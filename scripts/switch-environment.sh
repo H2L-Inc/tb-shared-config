@@ -66,8 +66,8 @@ get_display_name() {
     local env_name="$1"
     case "$env_name" in
         development) echo "開発環境" ;;
-        exhibition) echo "展示環境" ;;
         production) echo "本番環境" ;;
+        local) echo "ローカル環境" ;;
         *) echo "$env_name" ;;
     esac
 }

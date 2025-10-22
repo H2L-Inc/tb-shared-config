@@ -1,5 +1,5 @@
 {
-  "env": "exhibition",
+  "env": "production",
   "mqtt": {
     "broker_url": "mqtt://10.3.121.1:1883"
   },
