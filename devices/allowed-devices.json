@@ -1,0 +1,24 @@
+{
+  "allowed_macs": [
+    "34CDB035491C",
+    "34CDB03548E0",
+    "34CDB03548D8"
+  ],
+  "aliases": {
+    "34CDB03548D8": {
+      "nickname": "FVR-48D8",
+      "description": "Development test device",
+      "location": "Lab A"
+    },
+    "34CDB03548E0": {
+      "nickname": "FVR-48E0",
+      "description": "Exhibition device 1",
+      "location": "Booth 1"
+    },
+    "34CDB035491C": {
+      "nickname": "FVR-491C",
+      "description": "Exhibition device 2",
+      "location": "Booth 2"
+    }
+  }
+}

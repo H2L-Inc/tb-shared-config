@@ -1,0 +1,95 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://tb-project.local/schema/environment.schema.json",
+  "title": "TB Environment Configuration",
+  "description": "Configuration schema for TB exhibition environment settings",
+  "type": "object",
+  "required": ["env", "mqtt", "backend"],
+  "properties": {
+    "env": {
+      "type": "string",
+      "enum": ["development", "exhibition", "production"],
+      "description": "Environment name"
+    },
+    "mqtt": {
+      "type": "object",
+      "required": ["broker_url"],
+      "properties": {
+        "broker_url": {
+          "type": "string",
+          "pattern": "^mqtt://[^:]+:\\d+$",
+          "description": "MQTT broker URL (e.g., mqtt://localhost:1883)"
+        },
+        "username": {
+          "type": "string",
+          "description": "MQTT username (optional)"
+        },
+        "password": {
+          "type": "string",
+          "description": "MQTT password (optional)"
+        }
+      }
+    },
+    "backend": {
+      "type": "object",
+      "required": ["url", "port"],
+      "properties": {
+        "url": {
+          "type": "string",
+          "pattern": "^https?://[^:]+:\\d+$",
+          "description": "Backend API URL (e.g., http://localhost:4000)"
+        },
+        "port": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535,
+          "description": "Backend API port"
+        }
+      }
+    },
+    "influxdb": {
+      "type": "object",
+      "required": ["url", "org", "token"],
+      "properties": {
+        "url": {
+          "type": "string",
+          "description": "InfluxDB URL (e.g., http://localhost:8086)"
+        },
+        "org": {
+          "type": "string",
+          "description": "InfluxDB organization"
+        },
+        "token": {
+          "type": "string",
+          "description": "InfluxDB authentication token"
+        }
+      }
+    },
+    "grafana": {
+      "type": "object",
+      "required": ["url"],
+      "properties": {
+        "url": {
+          "type": "string",
+          "description": "Grafana URL (e.g., http://localhost:3000)"
+        }
+      }
+    },
+    "logging": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["error", "warn", "info", "debug"],
+          "default": "info",
+          "description": "Log level"
+        },
+        "dir": {
+          "type": "string",
+          "default": "./logs",
+          "description": "Log directory path"
+        }
+      }
+    }
+  }
+}

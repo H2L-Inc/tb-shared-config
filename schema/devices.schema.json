@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://tb-project.local/schema/devices.schema.json",
+  "title": "TB Devices Configuration",
+  "description": "Configuration schema for FirstVR device management",
+  "type": "object",
+  "required": ["allowed_macs", "aliases"],
+  "properties": {
+    "allowed_macs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[0-9A-F]{12}$",
+        "description": "MAC address without colons (e.g., 34CDB03548D8)"
+      },
+      "minItems": 1,
+      "maxItems": 10,
+      "uniqueItems": true,
+      "description": "List of allowed MAC addresses (whitelist)"
+    },
+    "aliases": {
+      "type": "object",
+      "patternProperties": {
+        "^[0-9A-F]{12}$": {
+          "type": "object",
+          "required": ["nickname"],
+          "properties": {
+            "nickname": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 20,
+              "description": "Short display name (e.g., FVR-48D8)"
+            },
+            "description": {
+              "type": "string",
+              "maxLength": 100,
+              "description": "Device description"
+            },
+            "location": {
+              "type": "string",
+              "maxLength": 50,
+              "description": "Physical location"
+            }
+          }
+        }
+      },
+      "additionalProperties": false,
+      "description": "Device aliases and metadata"
+    }
+  }
+}

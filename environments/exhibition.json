@@ -1,0 +1,22 @@
+{
+  "env": "exhibition",
+  "mqtt": {
+    "broker_url": "mqtt://192.168.153.128:1883"
+  },
+  "backend": {
+    "url": "http://192.168.153.128:4000",
+    "port": 4000
+  },
+  "influxdb": {
+    "url": "http://localhost:8086",
+    "org": "tb",
+    "token": "my-super-secret-admin-token-for-exhibition-tb-project"
+  },
+  "grafana": {
+    "url": "http://192.168.153.128:3000"
+  },
+  "logging": {
+    "level": "warn",
+    "dir": "./logs"
+  }
+}

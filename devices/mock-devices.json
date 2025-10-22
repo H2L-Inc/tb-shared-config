@@ -1,0 +1,24 @@
+{
+  "allowed_macs": [
+    "AABBCCDD0001",
+    "AABBCCDD0002",
+    "AABBCCDD0003"
+  ],
+  "aliases": {
+    "AABBCCDD0001": {
+      "nickname": "MOCK-01",
+      "description": "Mock device for testing",
+      "location": "Virtual"
+    },
+    "AABBCCDD0002": {
+      "nickname": "MOCK-02",
+      "description": "Mock device for testing",
+      "location": "Virtual"
+    },
+    "AABBCCDD0003": {
+      "nickname": "MOCK-03",
+      "description": "Mock device for testing",
+      "location": "Virtual"
+    }
+  }
+}
