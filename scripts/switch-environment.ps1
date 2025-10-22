@@ -88,16 +88,26 @@ function Get-CurrentEnvironment {
     # .env ファイルをチェック
     $envFiles = @(
         (Join-Path $projectRoot "tb-acq-backend\.env"),
-        (Join-Path $projectRoot "tb-acq-app\.env.local"),
         (Join-Path $projectRoot "tb-data-pipeline\.env")
     )
+
+    # tb-acq-appのVite .env.{mode}ファイルも追加
+    $appEnvPath = Join-Path $projectRoot "tb-acq-app"
+    if (Test-Path $appEnvPath) {
+        Get-ChildItem -Path $appEnvPath -Filter ".env.*" -File | ForEach-Object {
+            if ($_.Name -notmatch '\.example$' -and $_.Name -notmatch '\.local$') {
+                $envFiles += $_.FullName
+            }
+        }
+    }
 
     $currentEnv = $null
     foreach ($envFile in $envFiles) {
         if (Test-Path $envFile) {
             $content = Get-Content $envFile -Raw
-            if ($content -match 'ENV_NAME\s*=\s*([^\s\r\n]+)') {
-                $currentEnv = $matches[1]
+            # ENV_NAMEまたはVITE_ENV_NAMEをチェック
+            if ($content -match '(VITE_)?ENV_NAME\s*=\s*([^\s\r\n]+)') {
+                $currentEnv = $matches[2]
                 break
             }
         }
@@ -191,13 +201,14 @@ function Switch-Environment {
     }
     Write-Success "完了: tb-acq-backend\.env"
 
-    # フロントエンドの.env.localを更新
-    $frontendEnv = Join-Path $projectRoot "tb-acq-app\.env.local"
-    Write-Info "更新中: tb-acq-app\.env.local"
+    # フロントエンドの.env.{TargetEnv}を更新（Vite --mode対応）
+    $frontendEnv = Join-Path $projectRoot "tb-acq-app\.env.$TargetEnv"
+    Write-Info "更新中: tb-acq-app\.env.$TargetEnv"
     Update-EnvFile -FilePath $frontendEnv -EnvName $TargetEnv -Variables @{
+        "VITE_ENV_NAME" = $TargetEnv
         "VITE_BACKEND_URL" = $config.backend.url
     }
-    Write-Success "完了: tb-acq-app\.env.local"
+    Write-Success "完了: tb-acq-app\.env.$TargetEnv"
 
     # データパイプラインの.envを更新
     $pipelineEnv = Join-Path $projectRoot "tb-data-pipeline\.env"

@@ -76,14 +76,21 @@ get_display_name() {
 get_current_environment() {
     local env_files=(
         "$PROJECT_ROOT/tb-acq-backend/.env"
-        "$PROJECT_ROOT/tb-acq-app/.env.local"
         "$PROJECT_ROOT/tb-data-pipeline/.env"
     )
+
+    # tb-acq-appはViteの.env.{mode}形式を使用
+    for mode_file in "$PROJECT_ROOT/tb-acq-app/.env."*; do
+        if [ -f "$mode_file" ] && [[ ! "$mode_file" =~ \.example$ ]] && [[ ! "$mode_file" =~ \.local$ ]]; then
+            env_files+=("$mode_file")
+        fi
+    done
 
     local current_env=""
     for env_file in "${env_files[@]}"; do
         if [ -f "$env_file" ]; then
-            current_env=$(grep -E '^ENV_NAME=' "$env_file" | cut -d'=' -f2 | tr -d '\r\n' || echo "")
+            # ENV_NAMEまたはVITE_ENV_NAMEをチェック
+            current_env=$(grep -E '^(VITE_)?ENV_NAME=' "$env_file" | cut -d'=' -f2 | tr -d '\r\n' || echo "")
             if [ -n "$current_env" ]; then
                 break
             fi
@@ -199,13 +206,14 @@ switch_environment() {
         "INFLUXDB_URL=$influx_url"
     print_success "完了: tb-acq-backend/.env"
 
-    # フロントエンドの.env.localを更新
-    print_info "更新中: tb-acq-app/.env.local"
+    # フロントエンドの.env.{target_env}を更新（Vite --mode対応）
+    print_info "更新中: tb-acq-app/.env.$target_env"
     update_env_file \
-        "$PROJECT_ROOT/tb-acq-app/.env.local" \
+        "$PROJECT_ROOT/tb-acq-app/.env.$target_env" \
         "$target_env" \
+        "VITE_ENV_NAME=$target_env" \
         "VITE_BACKEND_URL=$backend_url"
-    print_success "完了: tb-acq-app/.env.local"
+    print_success "完了: tb-acq-app/.env.$target_env"
 
     # データパイプラインの.envを更新
     print_info "更新中: tb-data-pipeline/.env"
