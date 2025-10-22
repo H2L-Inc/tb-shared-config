@@ -1,19 +1,19 @@
 {
   "env": "development",
   "mqtt": {
-    "broker_url": "mqtt://192.168.153.121:1883"
+    "broker_url": "mqtt://192.168.68.123:1883"
   },
   "backend": {
-    "url": "http://192.168.153.121:4000",
+    "url": "http://192.168.68.123:4000",
     "port": 4000
   },
   "influxdb": {
-    "url": "http://192.168.153.121:8086",
+    "url": "http://192.168.68.123:8086",
     "org": "tb",
     "token": "my-super-secret-admin-token-for-exhibition-tb-project"
   },
   "grafana": {
-    "url": "http://192.168.153.121:3000"
+    "url": "http://192.168.68.123:3000"
   },
   "logging": {
     "level": "info",
