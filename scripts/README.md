@@ -40,7 +40,7 @@ cd C:\path\to\tb\tb-shared-config\scripts
 4. 確認プロンプト
 5. 以下のファイルを自動更新:
    - `tb-acq-backend/.env` - バックエンド設定
-   - `tb-acq-app/.env.local` - フロントエンド設定
+   - `tb-acq-app/.env` - フロントエンド設定
    - `tb-data-pipeline/.env` - データパイプライン設定
 
 ### 切り替え後の手順
@@ -84,8 +84,8 @@ docker compose restart
 
 ℹ 更新中: tb-acq-backend/.env
 ✓ 完了: tb-acq-backend/.env
-ℹ 更新中: tb-acq-app/.env.local
-✓ 完了: tb-acq-app/.env.local
+ℹ 更新中: tb-acq-app/.env
+✓ 完了: tb-acq-app/.env
 ℹ 更新中: tb-data-pipeline/.env
 ✓ 完了: tb-data-pipeline/.env
 
@@ -131,7 +131,7 @@ docker compose restart
 echo "ENV_NAME=development" > tb-acq-backend/.env
 
 # フロントエンド
-echo "ENV_NAME=development" > tb-acq-app/.env.local
+echo "VITE_ENV_NAME=development" > tb-acq-app/.env
 
 # データパイプライン
 echo "ENV_NAME=development" > tb-data-pipeline/.env

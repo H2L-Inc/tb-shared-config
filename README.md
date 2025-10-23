@@ -12,11 +12,15 @@ tb-shared-config/
 │   └── devices.schema.json      # デバイス設定のJSON Schema
 ├── environments/
 │   ├── development.json         # 開発環境設定
-│   ├── exhibition.json          # 展示環境設定
-│   └── local.json               # ローカル上書き用（gitignore）
-└── devices/
-    ├── allowed-devices.json     # MACホワイトリスト + エイリアス
-    └── mock-devices.json        # モックデバイス定義
+│   ├── production.json          # 展示環境設定（本番）
+│   └── local.json               # ローカル環境設定
+├── devices/
+│   ├── allowed-devices.json     # MACホワイトリスト + エイリアス
+│   └── mock-devices.json        # モックデバイス定義
+└── scripts/
+    ├── switch-environment.sh    # 環境切り替えスクリプト
+    ├── add-device.sh            # デバイス追加スクリプト
+    └── verify-network.sh        # ネットワーク疎通確認スクリプト
 ```
 
 ## 使い方
@@ -24,12 +28,16 @@ tb-shared-config/
 ### 1. 環境の切り替え
 
 ```bash
+# 環境の切り替えは switch-environment.sh スクリプトを使用してください
+bash scripts/switch-environment.sh
+
+# または直接環境変数を設定（非推奨）:
 # 開発環境
 export ENV_NAME=development
 npm run dev
 
-# 展示環境
-export ENV_NAME=exhibition
+# 展示環境（本番）
+export ENV_NAME=production
 npm start
 ```
 
@@ -55,7 +63,7 @@ npm start
 
 ### 3. ネットワーク設定の変更
 
-`environments/exhibition.json` を編集：
+`environments/production.json` を編集：
 
 ```json
 {
@@ -67,6 +75,9 @@ npm start
   }
 }
 ```
+
+**注意**: 開発環境 (development.json) のIPアドレスは固定ではありません。
+switch-environment.sh 実行時に入力プロンプトでIPアドレスを指定してください。
 
 ## バリデーション
 

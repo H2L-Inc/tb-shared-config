@@ -88,13 +88,14 @@ load_environment_config() {
 get_current_environment() {
     local env_files=(
         "$PROJECT_ROOT/tb-acq-backend/.env"
-        "$PROJECT_ROOT/tb-acq-app/.env.local"
+        "$PROJECT_ROOT/tb-acq-app/.env"
     )
 
     local current_env=""
     for env_file in "${env_files[@]}"; do
         if [ -f "$env_file" ]; then
-            current_env=$(grep -E '^ENV_NAME=' "$env_file" | cut -d'=' -f2 | tr -d '\r\n' || echo "")
+            # ENV_NAMEまたはVITE_ENV_NAMEをチェック
+            current_env=$(grep -E '^(VITE_)?ENV_NAME=' "$env_file" | cut -d'=' -f2 | tr -d '\r\n' || echo "")
             if [ -n "$current_env" ]; then
                 break
             fi
@@ -231,7 +232,7 @@ test_config_files() {
 
     local files=(
         "$PROJECT_ROOT/tb-acq-backend/.env"
-        "$PROJECT_ROOT/tb-acq-app/.env.local"
+        "$PROJECT_ROOT/tb-acq-app/.env"
         "$PROJECT_ROOT/tb-data-pipeline/.env"
     )
 
