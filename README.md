@@ -1,6 +1,8 @@
 # tb-shared-config
 
-共通設定管理リポジトリ
+共通設定管理リポジトリ（アーカイブ）
+
+**注意**: このリポジトリは参照用に保持されていますが、環境設定管理は各リポジトリの `.env` ファイルに移行しました。
 
 ## ディレクトリ構造
 
@@ -8,38 +10,35 @@
 tb-shared-config/
 ├── README.md                    # このファイル
 ├── schema/
-│   ├── environment.schema.json  # 環境設定のJSON Schema
-│   └── devices.schema.json      # デバイス設定のJSON Schema
+│   ├── environment.schema.json  # 環境設定のJSON Schema（参照用）
+│   └── devices.schema.json      # デバイス設定のJSON Schema（参照用）
 ├── environments/
-│   ├── development.json         # 開発環境設定
-│   ├── production.json          # 展示環境設定（本番）
-│   └── local.json               # ローカル環境設定
-├── devices/
-│   ├── allowed-devices.json     # MACホワイトリスト + エイリアス
-│   └── mock-devices.json        # モックデバイス定義
-└── scripts/
-    ├── switch-environment.sh     # 環境切り替えスクリプト (macOS/Linux)
-    ├── switch-environment.ps1    # 環境切り替えスクリプト (Windows)
-    ├── add-device.sh             # デバイス追加スクリプト
-    └── verify-network.sh         # ネットワーク疎通確認スクリプト
+│   ├── development.json         # 開発環境設定（参照用）
+│   ├── production.json          # 展示環境設定（参照用）
+│   └── local.json               # ローカル環境設定（参照用）
+└── devices/
+    ├── allowed-devices.json     # デバイス設定（参照用）
+    └── mock-devices.json        # モックデバイス定義（参照用）
 ```
 
-## 使い方
+## 現在の環境設定方法
 
-### 1. 環境の切り替え
+### 本番環境（Windows展示PC）
+
+```powershell
+cd tb-env-win/bin
+.\05_setup_env_production.ps1  # 自動で .env ファイル生成
+```
+
+### 開発環境（Mac/ローカル）
 
 ```bash
-# 環境の切り替えは switch-environment.sh スクリプトを使用してください
-bash scripts/switch-environment.sh
+# 各リポジトリの .env.example から .env を作成
+cp tb-acq-backend/.env.example tb-acq-backend/.env
+cp tb-acq-app/.env.example tb-acq-app/.env
+cp tb-data-pipeline/.env.example tb-data-pipeline/.env
 
-# または直接環境変数を設定（非推奨）:
-# 開発環境
-export ENV_NAME=development
-npm run dev
-
-# 展示環境（本番）
-export ENV_NAME=production
-npm start
+# 必要に応じて .env ファイルを編集
 ```
 
 ### 2. デバイスの追加
@@ -62,33 +61,15 @@ npm start
 }
 ```
 
-### 3. ネットワーク設定の変更
+### 3. デバイス管理
 
-`environments/production.json` を編集：
+**現在の実装**: MAC Guard は削除され、全ての FirstVR デバイスが自動的に受け入れられます。
 
-```json
-{
-  "mqtt": {
-    "broker_url": "mqtt://新しいIP:1883"
-  },
-  "backend": {
-    "url": "http://新しいIP:4000"
-  }
-}
-```
+デバイスエイリアスが必要な場合は、各アプリケーションのロジック内で管理してください。
 
-**注意**: 開発環境 (development.json) のIPアドレスは固定ではありません。
-switch-environment.sh 実行時に入力プロンプトでIPアドレスを指定してください。
+## 移行履歴
 
-## バリデーション
-
-設定ファイルは JSON Schema でバリデーションされます。
-
-```bash
-# スキーマ検証
-npm run validate:config
-```
-
-## 詳細設計
-
-詳細は `_vault/CONFIG_DESIGN.md` を参照してください。
+- 2025-10-24: 環境設定を `.env` ファイルベースに移行
+- ConfigLoader 削除、直接 `process.env` から読み込み
+- `switch-environment` スクリプト削除
+- MAC Guard 機能削除

@@ -58,19 +58,14 @@ ipconfig
 
 #### 1-2. 環境設定の切り替え
 
-展示環境（exhibition）に切り替えます。
+展示環境の設定ファイルを生成します。
 
 ```powershell
 # PowerShellを管理者権限で起動
-cd C:\path\to\tb\tb-shared-config\scripts
+cd C:\work\tb\tb-env-win\bin
 
-# 環境切り替えスクリプトを実行
-.\switch-environment.ps1
-
-# プロンプトに従って操作:
-# 1. 現在の環境を確認
-# 2. "exhibition" を選択
-# 3. 確認して実行
+# 環境変数を自動生成
+.\05_setup_env_production.ps1
 ```
 
 #### 1-3. 環境設定ファイルの更新
@@ -378,9 +373,9 @@ cd C:\path\to\tb\tb-shared-config
 # バックアップから復元
 copy E:\backup\tb-config\YYYYMMDD\allowed-devices.json devices\
 
-# 環境を再切り替え
-cd scripts
-.\switch-environment.ps1
+# 環境を再設定
+cd C:\work\tb\tb-env-win\bin
+.\05_setup_env_production.ps1
 ```
 
 ### サポート連絡先
@@ -410,22 +405,15 @@ C:\path\to\tb\tb-acq-backend\logs\
 ### 環境切り替え
 
 ```powershell
-cd C:\path\to\tb\tb-shared-config\scripts
-.\switch-environment.ps1
+cd C:\work\tb\tb-env-win\bin
+.\05_setup_env_production.ps1
 ```
 
-### デバイス追加
+### ヘルスチェック
 
 ```powershell
-cd C:\path\to\tb\tb-shared-config\scripts
-.\add-device.ps1
-```
-
-### ネットワーク検証
-
-```powershell
-cd C:\path\to\tb\tb-shared-config\scripts
-.\verify-network.ps1
+cd C:\work\tb\tb-env-win\bin
+.\80_health_check.ps1
 ```
 
 ### Docker操作
