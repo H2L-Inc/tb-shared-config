@@ -227,8 +227,10 @@ switch_environment() {
         mkdir -p "$(dirname "$backend_env")"
         if [ "$target_env" = "development" ] && [ -n "$custom_ip" ]; then
             # 開発環境の場合はIPアドレスを置換（http:// と mqtt:// の両方に対応）
-            sed -E "s|mqtt://[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|mqtt://$custom_ip|g" "$backend_template" | \
-            sed -E "s|https?://[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|http://$custom_ip|g" > "$backend_env"
+            # printf で余計な改行を防ぐ
+            content=$(sed -E "s|mqtt://[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|mqtt://$custom_ip|g" "$backend_template" | \
+                     sed -E "s|https?://[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|http://$custom_ip|g")
+            printf '%s' "$content" > "$backend_env"
             print_success "完了: tb-acq-backend/.env (← .env.$target_env, IP: $custom_ip)"
         else
             cp "$backend_template" "$backend_env"
@@ -251,8 +253,10 @@ switch_environment() {
         mkdir -p "$(dirname "$frontend_env")"
         if [ "$target_env" = "development" ] && [ -n "$custom_ip" ]; then
             # 開発環境の場合はIPアドレスを置換（http:// と mqtt:// の両方に対応）
-            sed -E "s|mqtt://[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|mqtt://$custom_ip|g" "$frontend_template" | \
-            sed -E "s|https?://[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|http://$custom_ip|g" > "$frontend_env"
+            # printf で余計な改行を防ぐ
+            content=$(sed -E "s|mqtt://[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|mqtt://$custom_ip|g" "$frontend_template" | \
+                     sed -E "s|https?://[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|http://$custom_ip|g")
+            printf '%s' "$content" > "$frontend_env"
             print_success "完了: tb-acq-app/.env (← .env.$target_env, IP: $custom_ip)"
         else
             cp "$frontend_template" "$frontend_env"
@@ -275,8 +279,10 @@ switch_environment() {
         mkdir -p "$(dirname "$pipeline_env")"
         if [ "$target_env" = "development" ] && [ -n "$custom_ip" ]; then
             # 開発環境の場合はIPアドレスを置換（http:// と mqtt:// の両方に対応）
-            sed -E "s|mqtt://[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|mqtt://$custom_ip|g" "$pipeline_template" | \
-            sed -E "s|https?://[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|http://$custom_ip|g" > "$pipeline_env"
+            # printf で余計な改行を防ぐ
+            content=$(sed -E "s|mqtt://[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|mqtt://$custom_ip|g" "$pipeline_template" | \
+                     sed -E "s|https?://[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|http://$custom_ip|g")
+            printf '%s' "$content" > "$pipeline_env"
             print_success "完了: tb-data-pipeline/.env (← .env.$target_env, IP: $custom_ip)"
         else
             cp "$pipeline_template" "$pipeline_env"
