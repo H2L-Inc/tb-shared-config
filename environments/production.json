@@ -1,14 +1,14 @@
 {
   "env": "production",
   "mqtt": {
-    "broker_url": "mqtt://10.3.121.1:1883"
+    "broker_url": "mqtt://localhost:1883"
   },
   "backend": {
     "url": "http://10.3.121.1:4000",
     "port": 4000
   },
   "influxdb": {
-    "url": "http://10.3.121.1:8086",
+    "url": "http://localhost:8086",
     "org": "tb",
     "token": "my-super-secret-admin-token-for-exhibition-tb-project"
   },
