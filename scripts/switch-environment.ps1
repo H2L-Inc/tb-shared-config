@@ -183,6 +183,29 @@ function Switch-Environment {
     Write-Info "環境を切り替えています: $TargetEnv"
     Write-Host ""
 
+    # 開発環境の場合はIPアドレスを入力させる
+    $customIp = $null
+    if ($TargetEnv -eq "development") {
+        Write-Host ""
+        Write-Warning "開発環境は固定IPではありません。サーバーのIPアドレスを入力してください。"
+        $customIp = Read-Host "サーバーのIPアドレス (例: 192.168.68.123)"
+
+        if ([string]::IsNullOrWhiteSpace($customIp)) {
+            Write-Error "IPアドレスが入力されませんでした"
+            return $false
+        }
+
+        # 簡易的なIPアドレス検証
+        if ($customIp -notmatch '^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$') {
+            Write-Error "無効なIPアドレス形式です: $customIp"
+            return $false
+        }
+
+        Write-Host ""
+        Write-Info "入力されたIPアドレス: $customIp"
+        Write-Host ""
+    }
+
     # 設定を読み込み
     $config = Read-EnvironmentConfig -EnvName $TargetEnv
     if (-not $config) {
@@ -200,10 +223,18 @@ function Switch-Environment {
         if (-not (Test-Path $backendDir)) {
             New-Item -ItemType Directory -Path $backendDir -Force | Out-Null
         }
-        Copy-Item -Path $backendTemplate -Destination $backendEnv -Force
-        if (Test-Path $backendEnv) {
-            Write-Success "完了: tb-acq-backend\.env (← .env.$TargetEnv)"
+        if ($TargetEnv -eq "development" -and -not [string]::IsNullOrWhiteSpace($customIp)) {
+            # 開発環境の場合はIPアドレスを置換（http:// と mqtt:// の両方に対応）
+            $content = Get-Content -Path $backendTemplate -Raw
+            $content = $content -replace 'mqtt://\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', "mqtt://$customIp"
+            $content = $content -replace 'https?://\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', "http://$customIp"
+            Set-Content -Path $backendEnv -Value $content -NoNewline -Encoding UTF8
+            Write-Success "完了: tb-acq-backend\.env (← .env.$TargetEnv, IP: $customIp)"
         } else {
+            Copy-Item -Path $backendTemplate -Destination $backendEnv -Force
+            Write-Success "完了: tb-acq-backend\.env (← .env.$TargetEnv)"
+        }
+        if (-not (Test-Path $backendEnv)) {
             Write-Error "ファイルの作成に失敗しました: $backendEnv"
             return $false
         }
@@ -221,10 +252,18 @@ function Switch-Environment {
         if (-not (Test-Path $frontendDir)) {
             New-Item -ItemType Directory -Path $frontendDir -Force | Out-Null
         }
-        Copy-Item -Path $frontendTemplate -Destination $frontendEnv -Force
-        if (Test-Path $frontendEnv) {
-            Write-Success "完了: tb-acq-app\.env (← .env.$TargetEnv)"
+        if ($TargetEnv -eq "development" -and -not [string]::IsNullOrWhiteSpace($customIp)) {
+            # 開発環境の場合はIPアドレスを置換（http:// と mqtt:// の両方に対応）
+            $content = Get-Content -Path $frontendTemplate -Raw
+            $content = $content -replace 'mqtt://\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', "mqtt://$customIp"
+            $content = $content -replace 'https?://\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', "http://$customIp"
+            Set-Content -Path $frontendEnv -Value $content -NoNewline -Encoding UTF8
+            Write-Success "完了: tb-acq-app\.env (← .env.$TargetEnv, IP: $customIp)"
         } else {
+            Copy-Item -Path $frontendTemplate -Destination $frontendEnv -Force
+            Write-Success "完了: tb-acq-app\.env (← .env.$TargetEnv)"
+        }
+        if (-not (Test-Path $frontendEnv)) {
             Write-Error "ファイルの作成に失敗しました: $frontendEnv"
             return $false
         }
@@ -242,10 +281,18 @@ function Switch-Environment {
         if (-not (Test-Path $pipelineDir)) {
             New-Item -ItemType Directory -Path $pipelineDir -Force | Out-Null
         }
-        Copy-Item -Path $pipelineTemplate -Destination $pipelineEnv -Force
-        if (Test-Path $pipelineEnv) {
-            Write-Success "完了: tb-data-pipeline\.env (← .env.$TargetEnv)"
+        if ($TargetEnv -eq "development" -and -not [string]::IsNullOrWhiteSpace($customIp)) {
+            # 開発環境の場合はIPアドレスを置換（http:// と mqtt:// の両方に対応）
+            $content = Get-Content -Path $pipelineTemplate -Raw
+            $content = $content -replace 'mqtt://\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', "mqtt://$customIp"
+            $content = $content -replace 'https?://\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', "http://$customIp"
+            Set-Content -Path $pipelineEnv -Value $content -NoNewline -Encoding UTF8
+            Write-Success "完了: tb-data-pipeline\.env (← .env.$TargetEnv, IP: $customIp)"
         } else {
+            Copy-Item -Path $pipelineTemplate -Destination $pipelineEnv -Force
+            Write-Success "完了: tb-data-pipeline\.env (← .env.$TargetEnv)"
+        }
+        if (-not (Test-Path $pipelineEnv)) {
             Write-Error "ファイルの作成に失敗しました: $pipelineEnv"
             return $false
         }
