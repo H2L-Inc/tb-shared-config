@@ -177,6 +177,29 @@ switch_environment() {
     print_info "環境を切り替えています: $target_env"
     echo ""
 
+    # 開発環境の場合はIPアドレスを入力させる
+    local custom_ip=""
+    if [ "$target_env" = "development" ]; then
+        echo ""
+        print_warning "開発環境は固定IPではありません。サーバーのIPアドレスを入力してください。"
+        read -p "サーバーのIPアドレス (例: 192.168.68.123): " custom_ip
+
+        if [ -z "$custom_ip" ]; then
+            print_error "IPアドレスが入力されませんでした"
+            return 1
+        fi
+
+        # 簡易的なIPアドレス検証
+        if ! [[ "$custom_ip" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            print_error "無効なIPアドレス形式です: $custom_ip"
+            return 1
+        fi
+
+        echo ""
+        print_info "入力されたIPアドレス: $custom_ip"
+        echo ""
+    fi
+
     # 設定を読み込み
     local config=$(read_environment_config "$target_env")
     if [ $? -ne 0 ]; then
@@ -202,10 +225,16 @@ switch_environment() {
     local backend_env="$PROJECT_ROOT/tb-acq-backend/.env"
     if [ -f "$backend_template" ]; then
         mkdir -p "$(dirname "$backend_env")"
-        cp "$backend_template" "$backend_env"
-        if [ -f "$backend_env" ]; then
-            print_success "完了: tb-acq-backend/.env (← .env.$target_env)"
+        if [ "$target_env" = "development" ] && [ -n "$custom_ip" ]; then
+            # 開発環境の場合はIPアドレスを置換（http:// と mqtt:// の両方に対応）
+            sed -E "s|mqtt://[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|mqtt://$custom_ip|g" "$backend_template" | \
+            sed -E "s|https?://[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|http://$custom_ip|g" > "$backend_env"
+            print_success "完了: tb-acq-backend/.env (← .env.$target_env, IP: $custom_ip)"
         else
+            cp "$backend_template" "$backend_env"
+            print_success "完了: tb-acq-backend/.env (← .env.$target_env)"
+        fi
+        if [ ! -f "$backend_env" ]; then
             print_error "ファイルの作成に失敗しました: $backend_env"
             return 1
         fi
@@ -220,10 +249,16 @@ switch_environment() {
     local frontend_env="$PROJECT_ROOT/tb-acq-app/.env"
     if [ -f "$frontend_template" ]; then
         mkdir -p "$(dirname "$frontend_env")"
-        cp "$frontend_template" "$frontend_env"
-        if [ -f "$frontend_env" ]; then
-            print_success "完了: tb-acq-app/.env (← .env.$target_env)"
+        if [ "$target_env" = "development" ] && [ -n "$custom_ip" ]; then
+            # 開発環境の場合はIPアドレスを置換（http:// と mqtt:// の両方に対応）
+            sed -E "s|mqtt://[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|mqtt://$custom_ip|g" "$frontend_template" | \
+            sed -E "s|https?://[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|http://$custom_ip|g" > "$frontend_env"
+            print_success "完了: tb-acq-app/.env (← .env.$target_env, IP: $custom_ip)"
         else
+            cp "$frontend_template" "$frontend_env"
+            print_success "完了: tb-acq-app/.env (← .env.$target_env)"
+        fi
+        if [ ! -f "$frontend_env" ]; then
             print_error "ファイルの作成に失敗しました: $frontend_env"
             return 1
         fi
@@ -238,10 +273,16 @@ switch_environment() {
     local pipeline_env="$PROJECT_ROOT/tb-data-pipeline/.env"
     if [ -f "$pipeline_template" ]; then
         mkdir -p "$(dirname "$pipeline_env")"
-        cp "$pipeline_template" "$pipeline_env"
-        if [ -f "$pipeline_env" ]; then
-            print_success "完了: tb-data-pipeline/.env (← .env.$target_env)"
+        if [ "$target_env" = "development" ] && [ -n "$custom_ip" ]; then
+            # 開発環境の場合はIPアドレスを置換（http:// と mqtt:// の両方に対応）
+            sed -E "s|mqtt://[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|mqtt://$custom_ip|g" "$pipeline_template" | \
+            sed -E "s|https?://[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|http://$custom_ip|g" > "$pipeline_env"
+            print_success "完了: tb-data-pipeline/.env (← .env.$target_env, IP: $custom_ip)"
         else
+            cp "$pipeline_template" "$pipeline_env"
+            print_success "完了: tb-data-pipeline/.env (← .env.$target_env)"
+        fi
+        if [ ! -f "$pipeline_env" ]; then
             print_error "ファイルの作成に失敗しました: $pipeline_env"
             return 1
         fi
