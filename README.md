@@ -18,9 +18,10 @@ tb-shared-config/
 │   ├── allowed-devices.json     # MACホワイトリスト + エイリアス
 │   └── mock-devices.json        # モックデバイス定義
 └── scripts/
-    ├── switch-environment.sh    # 環境切り替えスクリプト
-    ├── add-device.sh            # デバイス追加スクリプト
-    └── verify-network.sh        # ネットワーク疎通確認スクリプト
+    ├── switch-environment.sh     # 環境切り替えスクリプト (macOS/Linux)
+    ├── switch-environment.ps1    # 環境切り替えスクリプト (Windows)
+    ├── add-device.sh             # デバイス追加スクリプト
+    └── verify-network.sh         # ネットワーク疎通確認スクリプト
 ```
 
 ## 使い方
