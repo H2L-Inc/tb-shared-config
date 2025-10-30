@@ -336,14 +336,17 @@ docker compose ps
 docker compose restart config-influxdb-1
 ```
 
-#### 原因2: Pythonワーカーがエラー
+#### 原因2: Pythonワーカー（sensor_reader.exe）がエラー
 
 ```powershell
-# Python workerのログを確認
-docker compose logs python-worker
+# ログを確認
+Get-Content C:\workspace\tb\tb-data-pipeline\reports\worker\LATEST_SUMMARY.md
+Get-Content C:\workspace\tb\tb-data-pipeline\reports\worker\cron.log -Tail 100
 
-# エラーがある場合は再起動
-docker compose restart python-worker
+# 再起動（exe を再起動）
+cd C:\workspace\tb\tb-env-win\bin
+Stop-Process -Name sensor_reader -ErrorAction SilentlyContinue
+./40_start_worker.ps1
 ```
 
 ---
